@@ -25,13 +25,22 @@ Implementation Notes
 # imports__version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/foamyguy/Foamyguy_CircuitPython_nvm_helper.git"
 
-import microcontroller
-import msgpack
 import struct
 from io import BytesIO
+import microcontroller
+import msgpack
 
 
 def save_data(data, test_run=True, verbose=False):
+    """
+    Save arbitrary data objects to persist in nvm storage.
+
+    :param Union[list, dict, int, float, str] data: The data to save in nvm.
+    :param bool test_run: True will process data, but not save it to nvm. Set
+        False to save the data.
+    :param bool verbose: Informative prints about packaging and saving the data.
+    :return: None
+    """
     packed_data_io = BytesIO()
     msgpack.pack(data, packed_data_io)
     packed_data_io.seek(0)
@@ -48,14 +57,14 @@ def save_data(data, test_run=True, verbose=False):
     bytes_io_out.seek(0)
     if verbose:
         print(bytes_io_out.read())
-        #bytes_io_out.seek(0)
-        #print(bytes_io_out.read()[:4])
+        # bytes_io_out.seek(0)
+        # print(bytes_io_out.read()[:4])
         bytes_io_out.seek(0)
         print("total size from io: {}".format(len(bytes_io_out.read())))
         bytes_io_out.seek(0)
-    #size_unpacked = struct.unpack("i", bytes_io_out.read()[:4])[0]
-    #print("size_unpacked: {}".format(size_unpacked))
-    #bytes_io_out.seek(0)
+    # size_unpacked = struct.unpack("i", bytes_io_out.read()[:4])[0]
+    # print("size_unpacked: {}".format(size_unpacked))
+    # bytes_io_out.seek(0)
 
     total_size = len_of_data + 4
     if verbose:
@@ -73,10 +82,14 @@ def save_data(data, test_run=True, verbose=False):
     else:
         if verbose:
             print("test run, not saving to nvm")
-    #print(bytes_io_out.read())
+    # print(bytes_io_out.read())
 
 
 def read_data(verbose=False):
+    """
+    :param bool verbose: Informative prints about reading and unpacking the data.
+    :return: The data object that was saved with save_data().
+    """
     if verbose:
         print("first 4 bytes in nvm:")
         print(microcontroller.nvm[:4])
@@ -84,12 +97,12 @@ def read_data(verbose=False):
     if verbose:
         print("reading size unpacked: {}".format(size_unpacked))
 
-    read_data = microcontroller.nvm[:size_unpacked+4]
+    _read_data = microcontroller.nvm[: size_unpacked + 4]
     if verbose:
         print("read data:")
-        print(read_data)
+        print(_read_data)
     b = BytesIO()
-    b.write(read_data[4:size_unpacked+4])
+    b.write(_read_data[4 : size_unpacked + 4])
     b.seek(0)
 
     unpacked_data = msgpack.unpack(b)
@@ -99,21 +112,29 @@ def read_data(verbose=False):
     return unpacked_data
 
 
+def _test_save():
+    """
+    Used for illustrating issue on RP2040. Will be removed.
 
+    :return: None
+    """
 
-def test_save():
-    data = b'\x10\x00\x00\x00\x82\xa4name\xa4some\xa3num\\'
+    data = b"\x10\x00\x00\x00\x82\xa4name\xa4some\xa3num\\"
     print("len data: {}".format(len(data)))
-    microcontroller.nvm[0:len(data)] = data
+    microcontroller.nvm[0 : len(data)] = data
 
 
-def test_save_broken():
+def _test_save_broken():
+    """
+    Used for illustrating issue on RP2040. Will be removed.
+
+    :return: None
+    """
     b = BytesIO()
-    data = b'\x10\x00\x00\x00\x82\xa4name\xa4some\xa3num\\'
+    data = b"\x10\x00\x00\x00\x82\xa4name\xa4some\xa3num\\"
     b.write(data)
     b.seek(0)
     val_to_write = b.read()
     print(val_to_write)
     print("len val: {}".format(len(val_to_write)))
-    microcontroller.nvm[0:len(val_to_write)] = val_to_write
-
+    microcontroller.nvm[0 : len(val_to_write)] = val_to_write
