@@ -2,7 +2,7 @@ Introduction
 ============
 
 
-.. image:: https://readthedocs.org/projects/foamyguy-circuitpython-nvm-helper/badge/?version=latest
+.. image:: https://readthedocs.org/projects/circuitpython-nvm-helper/badge/?version=latest
     :target: https://circuitpython-nvm-helper.readthedocs.io/
     :alt: Documentation Status
 
