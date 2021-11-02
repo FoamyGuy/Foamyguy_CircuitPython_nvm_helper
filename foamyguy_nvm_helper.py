@@ -5,7 +5,9 @@
 `foamyguy_nvm_helper`
 ================================================================================
 
-Easy interface to store and retrieve objects persisted via NVM
+Easy interface to store and retrieve objects persisted via NVM.
+First 4 bytes are an int that contains the total size of bytes stored in nvm.
+Remaining space used to store data packed with msgpack.pack()
 
 
 * Author(s): Tim Cocks
