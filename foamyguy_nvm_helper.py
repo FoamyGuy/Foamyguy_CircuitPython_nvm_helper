@@ -26,6 +26,10 @@ Implementation Notes
 
 # imports__version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/foamyguy/Foamyguy_CircuitPython_nvm_helper.git"
+try:
+    from typing import Union
+except ImportError:
+    pass
 
 import struct
 from io import BytesIO
@@ -33,7 +37,11 @@ import microcontroller
 import msgpack
 
 
-def save_data(data, test_run=True, verbose=False):
+def save_data(
+    data: Union[object, list, dict, int, float, str],
+    test_run: bool = True,
+    verbose: bool = False,
+) -> None:
     """
     Save arbitrary data objects to persist in nvm storage.
 
@@ -87,7 +95,7 @@ def save_data(data, test_run=True, verbose=False):
     # print(bytes_io_out.read())
 
 
-def read_data(verbose=False):
+def read_data(verbose: bool = False) -> Union[object, list, dict, int, float, str]:
     """
     :param bool verbose: Informative prints about reading and unpacking the data.
     :return: The data object that was saved with save_data().
@@ -112,31 +120,3 @@ def read_data(verbose=False):
         print("unpacked_data:")
         print(unpacked_data)
     return unpacked_data
-
-
-def _test_save():
-    """
-    Used for illustrating issue on RP2040. Will be removed.
-
-    :return: None
-    """
-
-    data = b"\x10\x00\x00\x00\x82\xa4name\xa4some\xa3num\\"
-    print("len data: {}".format(len(data)))
-    microcontroller.nvm[0 : len(data)] = data
-
-
-def _test_save_broken():
-    """
-    Used for illustrating issue on RP2040. Will be removed.
-
-    :return: None
-    """
-    b = BytesIO()
-    data = b"\x10\x00\x00\x00\x82\xa4name\xa4some\xa3num\\"
-    b.write(data)
-    b.seek(0)
-    val_to_write = b.read()
-    print(val_to_write)
-    print("len val: {}".format(len(val_to_write)))
-    microcontroller.nvm[0 : len(val_to_write)] = val_to_write
